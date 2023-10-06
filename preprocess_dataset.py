@@ -14,13 +14,18 @@ pd.set_option('display.width', 200)
 
 nltk.download("stopwords")
 stop_words = stopwords.words("english")
+stop_words.append('Are')
+stop_words.append('u')
+stop_words.append('I')
 nltk.download('punkt')
 
 # initialize NLTK sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
-pos_word_list = []
-neu_word_list = []
-neg_word_list = []
+positive_words = []
+neutral_words = []
+negative_words = []
+chat_with_univ_fellows_most_used_word = {}
+chat_with_close_friends_most_used_word = {}
 
 
 def data_collection():
@@ -118,15 +123,53 @@ def populate_positive_negative_neutral_words():
         for word in tokens:
             # print(word)
             if (analyzer.polarity_scores(word)['compound']) >= 0.5:
-                pos_word_list.append(word)
+                positive_words.append(word)
             elif (analyzer.polarity_scores(word)['compound']) <= -0.5:
-                neg_word_list.append(word)
+                negative_words.append(word)
             else:
-                neu_word_list.append(word)
+                neutral_words.append(word)
 
-    print('Positive :', pos_word_list)
-    print('Neutral :', neu_word_list)
-    print('Negative :', neg_word_list)
+    print('Positive :', positive_words)
+    print('Neutral :', neutral_words)
+    print('Negative :', negative_words)
+
+
+def populate_most_used_words():
+    df_univ_fellows = df[df['Chat_With'] == 'Univ Fellows']
+    for tokens in df_univ_fellows['Message'].apply(token):
+        for word in tokens:
+            item = chat_with_univ_fellows_most_used_word.get(word)
+            # print('item: ', item)
+            if item is None:
+                chat_with_univ_fellows_most_used_word[word] = 1
+            else:
+                item = item + 1
+                chat_with_univ_fellows_most_used_word[word] = item
+
+    df_close_friends = df[df['Chat_With'] == 'Close Friends']
+    for tokens in df_close_friends['Message'].apply(token):
+        for word in tokens:
+            item = chat_with_close_friends_most_used_word.get(item)
+            if item is None:
+                chat_with_close_friends_most_used_word[word] = 1
+            else:
+                item = item + 1
+                chat_with_close_friends_most_used_word[word] = item
+
+    print('chat_with_univ_fellows_most_used_word :', chat_with_univ_fellows_most_used_word)
+    print('chat_with_close_friends_most_used_word :', chat_with_close_friends_most_used_word)
+
+    univ_fellows_sorted_keys = sorted(chat_with_univ_fellows_most_used_word,
+                                      key=chat_with_univ_fellows_most_used_word.get,
+                                      reverse=True)
+    #for r in univ_fellows_sorted_keys:
+    #    print(r, chat_with_univ_fellows_most_used_word[r])
+
+    close_friends_sorted_keys = sorted(chat_with_close_friends_most_used_word,
+                                       key=chat_with_close_friends_most_used_word.get,
+                                       reverse=True)
+    for r in close_friends_sorted_keys:
+        print(r, chat_with_close_friends_most_used_word[r])
 
 
 if __name__ == '__main__':
@@ -139,3 +182,4 @@ if __name__ == '__main__':
     print(df.head())
 
     populate_positive_negative_neutral_words()
+    populate_most_used_words()
