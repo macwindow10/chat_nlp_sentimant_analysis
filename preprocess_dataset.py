@@ -15,8 +15,12 @@ pd.set_option('display.width', 200)
 nltk.download("stopwords")
 stop_words = stopwords.words("english")
 nltk.download('punkt')
+
 # initialize NLTK sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
+pos_word_list = []
+neu_word_list = []
+neg_word_list = []
 
 
 def data_collection():
@@ -109,6 +113,22 @@ def remove_stopwords(df):
     return result
 
 
+def populate_positive_negative_neutral_words():
+    for tokens in df['Message'].apply(token):
+        for word in tokens:
+            # print(word)
+            if (analyzer.polarity_scores(word)['compound']) >= 0.5:
+                pos_word_list.append(word)
+            elif (analyzer.polarity_scores(word)['compound']) <= -0.5:
+                neg_word_list.append(word)
+            else:
+                neu_word_list.append(word)
+
+    print('Positive :', pos_word_list)
+    print('Neutral :', neu_word_list)
+    print('Negative :', neg_word_list)
+
+
 if __name__ == '__main__':
     df = data_collection()
     df = pre_processing(df)
@@ -117,3 +137,5 @@ if __name__ == '__main__':
     # apply get sentiment score
     df['Sentiment_Score'] = df['Message'].apply(get_sentiment_score)
     print(df.head())
+
+    populate_positive_negative_neutral_words()
