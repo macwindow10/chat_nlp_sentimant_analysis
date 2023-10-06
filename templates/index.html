@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sentiment Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Roboto';font-size: 22px;
+        }
+        .container {
+            max-width: 1000px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Sentiment Analysis</h1>
+    <div class="row">
+
+    </div>
+    <br/>
+    <h3 style="color: red"></h3>
+
+    <form action="/uploader" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file"/>
+        <input type="submit" class="btn"/>
+    </form>
+
+    <br/>
+    <input type="button" class="btn btn-primary" value="Process" onclick="process()"/>
+
+    <br/>
+    <div class="panel-group">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Sentiment Score</div>
+            <div class="panel-body">{{input_sentence}}</div>
+        </div>
+    </div>
+    <br>
+    {% for error in errors %}
+    <h4>{{ error }}</h4>
+    {% endfor %}
+</div>
+<script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script>
+    function process() {
+        alert('process');
+        $.ajax({
+          type: 'POST',
+          url: "/process",
+          data: {student_id: 1},
+          dataType: "text",
+          success: function(data){
+                     alert("Deleted Student ID "+ student_id.toString());
+                   }
+        });
+    }
+</script>
+</body>
+</html>
