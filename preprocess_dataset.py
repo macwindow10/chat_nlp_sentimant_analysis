@@ -26,6 +26,8 @@ neutral_words = []
 negative_words = []
 chat_with_univ_fellows_most_used_word = {}
 chat_with_close_friends_most_used_word = {}
+most_active_user_in_univ_fellows = ""
+most_active_user_in_close_friends = ""
 
 
 def data_collection():
@@ -65,9 +67,9 @@ def pre_processing(df):
     # As we are going to do a NLP project so,
     # we need only ratings and reviews columns.
     # We will drop rest of the columns!
-    df.drop(['Day', 'Date', 'Time', 'User Name', 'Media'],
+    df.drop(['Day', 'Date', 'Time', 'Media'],
             axis=1, inplace=True)
-    df.columns = ['Message', 'Chat_With', 'Sentiment_Score']
+    df.columns = ['User Name', 'Message', 'Chat_With', 'Sentiment_Score']
     print(df.head())
 
     # check null values
@@ -119,6 +121,7 @@ def remove_stopwords(df):
 
 
 def populate_positive_negative_neutral_words():
+    print('* * * * * Positive, Negative & Neutral Words * * * * *')
     for tokens in df['Message'].apply(token):
         for word in tokens:
             # print(word)
@@ -135,6 +138,7 @@ def populate_positive_negative_neutral_words():
 
 
 def populate_most_used_words():
+    print('* * * * * Most used Words in each Group * * * * *')
     df_univ_fellows = df[df['Chat_With'] == 'Univ Fellows']
     for tokens in df_univ_fellows['Message'].apply(token):
         for word in tokens:
@@ -156,20 +160,76 @@ def populate_most_used_words():
                 item = item + 1
                 chat_with_close_friends_most_used_word[word] = item
 
-    print('chat_with_univ_fellows_most_used_word :', chat_with_univ_fellows_most_used_word)
-    print('chat_with_close_friends_most_used_word :', chat_with_close_friends_most_used_word)
+    # print('chat_with_univ_fellows_most_used_word :', chat_with_univ_fellows_most_used_word)
+    # print('chat_with_close_friends_most_used_word :', chat_with_close_friends_most_used_word)
 
     univ_fellows_sorted_keys = sorted(chat_with_univ_fellows_most_used_word,
                                       key=chat_with_univ_fellows_most_used_word.get,
                                       reverse=True)
-    #for r in univ_fellows_sorted_keys:
-    #    print(r, chat_with_univ_fellows_most_used_word[r])
+    print('Most used words in Chat with University Fellows Group')
+    i = 0
+    for r in univ_fellows_sorted_keys:
+        print(r, chat_with_univ_fellows_most_used_word[r])
+        i = i + 1
+        if i == 10:
+            break
 
     close_friends_sorted_keys = sorted(chat_with_close_friends_most_used_word,
                                        key=chat_with_close_friends_most_used_word.get,
                                        reverse=True)
+    print('Most used words in Chat with Close Friends Group')
+    i = 0
     for r in close_friends_sorted_keys:
         print(r, chat_with_close_friends_most_used_word[r])
+        i = i + 1
+        if i == 10:
+            break
+
+
+def populate_most_active_user():
+    print('* * * * * Most Active user in each Group * * * * *')
+    users_in_univ_fellows = {}
+    df_univ_fellows = df[df['Chat_With'] == 'Univ Fellows']
+    for user in df_univ_fellows['User Name']:
+        item = users_in_univ_fellows.get(user)
+        # print('item: ', item)
+        if item is None:
+            users_in_univ_fellows[user] = 1
+        else:
+            item = item + 1
+            users_in_univ_fellows[user] = item
+
+    users_in_close_freinds = {}
+    df_close_friends = df[df['Chat_With'] == 'Close Friends']
+    for user in df_close_friends['User Name']:
+        item = users_in_close_freinds.get(user)
+        if item is None:
+            users_in_close_freinds[user] = 1
+        else:
+            item = item + 1
+            users_in_close_freinds[user] = item
+
+    # print(users_in_univ_fellows)
+    # print(users_in_close_freinds)
+    univ_fellows_sorted_keys = sorted(users_in_univ_fellows,
+                                      key=users_in_univ_fellows.get,
+                                      reverse=True)
+    i = 0
+    for r in univ_fellows_sorted_keys:
+        print('Most Active User in Chat with University Fellows Group: ', r)
+        i = i + 1
+        if i == 1:
+            break
+
+    close_friends_sorted_keys = sorted(users_in_close_freinds,
+                                       key=users_in_close_freinds.get,
+                                       reverse=True)
+    i = 0
+    for r in close_friends_sorted_keys:
+        print('Most Active User in Chat with Close Friends Group: ', r)
+        i = i + 1
+        if i == 1:
+            break
 
 
 if __name__ == '__main__':
@@ -183,3 +243,4 @@ if __name__ == '__main__':
 
     populate_positive_negative_neutral_words()
     populate_most_used_words()
+    populate_most_active_user()
