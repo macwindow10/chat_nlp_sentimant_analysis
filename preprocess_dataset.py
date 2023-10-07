@@ -26,8 +26,6 @@ neutral_words = []
 negative_words = []
 chat_with_univ_fellows_most_used_word = {}
 chat_with_close_friends_most_used_word = {}
-most_active_user_in_univ_fellows = ""
-most_active_user_in_close_friends = ""
 
 
 def data_collection():
@@ -67,9 +65,9 @@ def pre_processing(df):
     # As we are going to do a NLP project so,
     # we need only ratings and reviews columns.
     # We will drop rest of the columns!
-    df.drop(['Day', 'Date', 'Time', 'Media'],
+    df.drop(['Day', 'Time', 'Media'],
             axis=1, inplace=True)
-    df.columns = ['User Name', 'Message', 'Chat_With', 'Sentiment_Score']
+    df.columns = ['Date', 'User Name', 'Message', 'Chat_With', 'Sentiment_Score']
     print(df.head())
 
     # check null values
@@ -232,6 +230,35 @@ def populate_most_active_user():
             break
 
 
+def per_day_messages_by_each_memeber_in_each_group():
+    print('* * * * * Per Day Messages by each Memeber in each Group * * * * *')
+    df_univ_fellows = df[df['Chat_With'] == 'Univ Fellows']
+    unique_days_in_univ_fellows = df_univ_fellows['Date'].unique()
+    unique_users_in_univ_fellows = df_univ_fellows['User Name'].unique()
+    # print(unique_days_in_univ_fellows)
+    # print(unique_users_in_univ_fellows)
+    print('University Fellows Group')
+    for date in unique_days_in_univ_fellows:
+        df_filter_by_date = df_univ_fellows[df_univ_fellows['Date'] == date]
+        print('Date: ', date)
+        for user in unique_users_in_univ_fellows:
+            df_filter_by_date_by_user = df_filter_by_date[df_filter_by_date['User Name'] == user]
+            print('\tUser:', user, ',\tNo. of Messages: ', len(df_filter_by_date_by_user))
+
+    df_close_friends = df[df['Chat_With'] == 'Close Friends']
+    unique_days_in_close_friends = df_close_friends['Date'].unique()
+    unique_users_in_close_friends = df_close_friends['User Name'].unique()
+    print(unique_days_in_close_friends)
+    print(unique_users_in_close_friends)
+    print('Close Friends Group')
+    for date in unique_days_in_close_friends:
+        df_filter_by_date = df_close_friends[df_close_friends['Date'] == date]
+        print('Date: ', date)
+        for user in unique_users_in_close_friends:
+            df_filter_by_date_by_user = df_filter_by_date[df_filter_by_date['User Name'] == user]
+            print('\tUser:', user, ',\tNo. of Messages: ', len(df_filter_by_date_by_user))
+
+
 if __name__ == '__main__':
     df = data_collection()
     df = pre_processing(df)
@@ -244,3 +271,4 @@ if __name__ == '__main__':
     populate_positive_negative_neutral_words()
     populate_most_used_words()
     populate_most_active_user()
+    per_day_messages_by_each_memeber_in_each_group()
